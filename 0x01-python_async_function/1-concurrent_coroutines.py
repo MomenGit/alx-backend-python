@@ -15,6 +15,9 @@ async def wait_n(n: int, max_delay: int = 10) -> List[float]:
         max_delay(int): The max number for the random value generated for delay
     """
 
-    delays: List[float] = [await wait_random(max_delay) for _ in range(n)]
+    coroutines = [wait_random(max_delay) for _ in range(n)]
+    delays = []
+    for future in asyncio.as_completed(coroutines):
+        delays.append(await future)
 
-    return sorted(delays)
+    return delays
