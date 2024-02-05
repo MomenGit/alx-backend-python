@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Test cases for the Utils module"""
 from typing import Mapping, Sequence
+from unittest import result
+
+from defer import return_value
 import utils
 import unittest
 from parameterized import parameterized
@@ -47,3 +50,23 @@ class TestGetJson(unittest.TestCase):
         result = utils.get_json(test_url)
         mock_get.assert_called_once_with(test_url)
         self.assertEqual(result, test_payload)
+
+
+class TestMemoize(unittest.TestCase):
+    """Test cases for utils.memoize function"""
+
+    def test_memoize(self):
+        """Mock test utils.memoize function"""
+        class TestClass:
+            def a_method(self):
+                return 42
+
+            @utils.memoize
+            def a_property(self):
+                return self.a_method()
+
+        with patch.object(TestClass, "a_method", autospec=True) as mocked_a:
+            test_class = TestClass()
+            test_class.a_property()
+            test_class.a_property()
+            mocked_a.assert_called_once()
