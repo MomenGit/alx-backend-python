@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 """Test cases for the Utils module"""
 from typing import Mapping, Sequence
-from unittest import result
-
-from defer import return_value
 import utils
 import unittest
 from parameterized import parameterized
@@ -58,6 +55,8 @@ class TestMemoize(unittest.TestCase):
     def test_memoize(self):
         """Mock test utils.memoize function"""
         class TestClass:
+            """A Test Class to try memoization on"""
+
             def a_method(self):
                 return 42
 
