@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test cases for client module"""
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 import client
 from parameterized import parameterized
 
@@ -25,6 +25,16 @@ class TestGithubOrgClient(unittest.TestCase):
         org2 = org_client.org
         mocked_get.assert_called_once()
         self.assertEqual(org1, org2)
+
+    def test_public_repos_url(self):
+        """"""
+        with patch('client.GithubOrgClient.org',
+                   new_callable=PropertyMock) as mocked_org:
+            payload = {"repos_url": True}
+            mocked_org.return_value = payload
+            org_client = client.GithubOrgClient("test")
+            self.assertEqual(org_client._public_repos_url,
+                             payload["repos_url"])
 
 
 if __name__ == "__main__":
