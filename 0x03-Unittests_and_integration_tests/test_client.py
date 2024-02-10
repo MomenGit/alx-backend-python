@@ -82,11 +82,11 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         cls.get_patcher.stop()
 
     def setUp(self) -> None:
+        """Hook method for setting up the test fixture before exercising it"""
         self.mock_get.side_effect = [
             MagicMock(json=lambda: self.org_payload),
             MagicMock(json=lambda: self.repos_payload)
         ]
-        return super().setUp()
 
     def test_public_repos(self):
         """
