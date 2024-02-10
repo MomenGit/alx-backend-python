@@ -3,7 +3,8 @@
 import unittest
 from unittest.mock import MagicMock, PropertyMock, patch
 import client
-from parameterized import parameterized
+from parameterized import parameterized, parameterized_class
+from fixtures import TEST_PAYLOAD
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -48,7 +49,6 @@ class TestGithubOrgClient(unittest.TestCase):
         mocked_get.return_value = json_payload
         with patch('client.GithubOrgClient._public_repos_url',
                    new_callable=PropertyMock) as mocked_url:
-            mocked_url.return_value = ""
             org_client = client.GithubOrgClient("test")
             result = org_client.public_repos()
             check = [repo["name"] for repo in json_payload]
@@ -63,6 +63,36 @@ class TestGithubOrgClient(unittest.TestCase):
         """Parameterized unit-test for client.GithubOrgClient.has_license"""
         self.assertEqual(client.GithubOrgClient.has_license(
             repo, license_key), expected)
+
+
+@parameterized_class(attrs=(
+    "org_payload",
+    "repos_payload",
+    "expected_repos",
+    "apache2_repos"), input_values=TEST_PAYLOAD)
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """"""
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.get_patcher = patch('utils.requests.get')
+        cls.mock_get = cls.get_patcher.start()
+        cls.mock_get.side_effect = [
+            MagicMock(json=lambda: cls.org_payload),
+            MagicMock(json=lambda: cls.repos_payload)
+        ]
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        """
+        Test client.GithubOrgClient.public_repos method in an integration test
+        That means that we will only mock code that sends external requests
+        """
+        org_client = client.GithubOrgClient('test_org')
+        public_repos = org_client.public_repos()
+        self.assertEqual(public_repos, self.expected_repos)
 
 
 if __name__ == "__main__":
