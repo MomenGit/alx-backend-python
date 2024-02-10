@@ -74,7 +74,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     """"""
     @classmethod
     def setUpClass(cls) -> None:
-        cls.get_patcher = patch('utils.requests.get')
+        cls.get_patcher = patch('requests.get')
         cls.mock_get = cls.get_patcher.start()
         cls.mock_get.side_effect = [
             MagicMock(json=lambda: cls.org_payload),
