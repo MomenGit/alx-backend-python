@@ -76,14 +76,17 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.get_patcher = patch('requests.get')
         cls.mock_get = cls.get_patcher.start()
-        cls.mock_get.side_effect = [
-            MagicMock(json=lambda: cls.org_payload),
-            MagicMock(json=lambda: cls.repos_payload)
-        ]
 
     @classmethod
     def tearDownClass(cls):
         cls.get_patcher.stop()
+
+    def setUp(self) -> None:
+        self.mock_get.side_effect = [
+            MagicMock(json=lambda: self.org_payload),
+            MagicMock(json=lambda: self.repos_payload)
+        ]
+        return super().setUp()
 
     def test_public_repos(self):
         """
@@ -93,6 +96,12 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         org_client = client.GithubOrgClient('test_org')
         public_repos = org_client.public_repos()
         self.assertEqual(public_repos, self.expected_repos)
+
+    def test_public_repos_with_license(self):
+        """Test the public_repos with the argument license="apache-2.0"""
+        org_client = client.GithubOrgClient('test_org')
+        public_repos = org_client.public_repos(license="apache-2.0")
+        self.assertEqual(public_repos, self.apache2_repos)
 
 
 if __name__ == "__main__":
