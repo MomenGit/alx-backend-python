@@ -71,7 +71,7 @@ class TestGithubOrgClient(unittest.TestCase):
     "expected_repos",
     "apache2_repos"), input_values=TEST_PAYLOAD)
 class TestIntegrationGithubOrgClient(unittest.TestCase):
-    """"""
+    """Integration Test class for client.GithubOrgClient"""
     @classmethod
     def setUpClass(cls) -> None:
         cls.get_patcher = patch('requests.get')
