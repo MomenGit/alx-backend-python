@@ -2,7 +2,6 @@
 """Test cases for client module"""
 import unittest
 from unittest.mock import MagicMock, PropertyMock, patch
-from xxlimited import new
 import client
 from parameterized import parameterized
 
@@ -29,7 +28,8 @@ class TestGithubOrgClient(unittest.TestCase):
 
     def test_public_repos_url(self):
         """
-        Test that the list of repos is what you expect from the chosen payload
+        Test that the result of _public_repos_url is the expected one
+        based on the mocked payload
         """
         with patch('client.GithubOrgClient.org',
                    new_callable=PropertyMock) as mocked_org:
@@ -41,7 +41,9 @@ class TestGithubOrgClient(unittest.TestCase):
 
     @patch('client.get_json')
     def test_public_repos(self, mocked_get):
-        """"""
+        """
+        Test that the list of repos is what you expect from the chosen payload
+        """
         json_payload = [{"name": "Google"}, {"name": "YouTube"}]
         mocked_get.return_value = json_payload
         with patch('client.GithubOrgClient._public_repos_url',
@@ -53,6 +55,14 @@ class TestGithubOrgClient(unittest.TestCase):
             self.assertEqual(result, check)
             mocked_url.assert_called_once()
             mocked_get.assert_called_once()
+
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False)])
+    def test_has_license(self, repo, license_key, expected):
+        """Parameterized unit-test for client.GithubOrgClient.has_license"""
+        self.assertEqual(client.GithubOrgClient.has_license(
+            repo, license_key), expected)
 
 
 if __name__ == "__main__":
